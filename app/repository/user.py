@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy.orm import Session
 from app.db.models.users import User
+from app.services.hashing import Hasher
 
 
 class UserRepository:
@@ -12,7 +13,10 @@ class UserRepository:
         self, name: str, surname: str, email: str, hashed_password: str
     ) -> User:
         user = User(
-            name=name, surname=surname, email=email, hashed_password=hashed_password
+            name=name,
+            surname=surname,
+            email=email,
+            hashed_password=Hasher.get_password_hash(hashed_password),
         )
 
         self._db.add(user)
@@ -23,6 +27,11 @@ class UserRepository:
 
     def get_user_by_id(self, user_id: uuid.UUID) -> User | None:
         user = self._db.query(User).filter(User.user_id == user_id).first()
+
+        return user
+
+    def get_user_by_email(self, email: str) -> User | None:
+        user = self._db.query(User).filter(User.email == email).first()
 
         return user
 

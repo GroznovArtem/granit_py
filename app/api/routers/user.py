@@ -3,6 +3,8 @@ import uuid
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from app.core.auth import get_current_user_from_token
+from app.db.models.users import User
 
 from app.api.schemas.user import (
     CreateUserResponse,
@@ -37,7 +39,11 @@ def create_user(
 
 
 @user_router.get("/{user_id}", response_model=GetUserResponse)
-def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)) -> GetUserResponse:
+def get_user(
+    user_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+) -> GetUserResponse:
     user = get_user_by_id(db, user_id)
 
     if not user:
