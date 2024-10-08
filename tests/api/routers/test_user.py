@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import pytest
@@ -26,7 +25,7 @@ def test_create_user(db, client, user_params):
     assert response.json() == {
         "name": "Artem",
         "surname": "Groznov",
-        "email": "a.g@ya.ru"
+        "email": "a.g@ya.ru",
     }
 
     created_user = db.query(User).filter(User.user_id == user_params["user_id"])
@@ -64,7 +63,7 @@ def test_delete_user(db, client, create_user_in_db, user_params):
 
     user = db.query(User).filter(User.user_id == user_params["user_id"]).first()
 
-    assert user.is_active == False
+    assert not user.is_active
 
 
 def test_delete_user_if_not_found(db, client, create_user_in_db, user_params):
@@ -88,7 +87,9 @@ def test_update_user(db, client, create_user_in_db, user_params):
         "email": "a.v@ya.ru",
     }
 
-    response = client.patch("/user/{}".format(user_params["user_id"]), json=data_to_update)
+    response = client.patch(
+        "/user/{}".format(user_params["user_id"]), json=data_to_update
+    )
 
     assert response.status_code == 200
     assert response.json() == {
@@ -115,7 +116,9 @@ def test_update_user_if_not_found(db, client, create_user_in_db, user_params):
         "email": "a.v@ya.ru",
     }
 
-    response = client.patch("/user/{}".format(user_params["user_id"]), json=data_to_update)
+    response = client.patch(
+        "/user/{}".format(user_params["user_id"]), json=data_to_update
+    )
 
     assert response.status_code == 404
     assert response.json() == {

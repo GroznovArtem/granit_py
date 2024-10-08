@@ -2,8 +2,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
 
-from app.api.schemas.user import ShowUser, CreateUserRequest, CreateUserResponse, GetUserResponse, DeleteUserResponse, \
-    UpdateUserRequest, UpdateUserResponse
+from app.api.schemas.user import (
+    CreateUserRequest,
+    CreateUserResponse,
+    GetUserResponse,
+    DeleteUserResponse,
+    UpdateUserRequest,
+    UpdateUserResponse,
+)
 from app.repository.user import UserRepository
 
 import uuid
@@ -13,7 +19,12 @@ def create_new_user(db: Session, params: CreateUserRequest) -> CreateUserRespons
     user_repo = UserRepository(db)
 
     try:
-        user = user_repo.create_user(name=params.name, surname=params.surname, email=params.email, hashed_password=params.hashed_password)
+        user = user_repo.create_user(
+            name=params.name,
+            surname=params.surname,
+            email=params.email,
+            hashed_password=params.hashed_password,
+        )
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -50,15 +61,20 @@ def delete_user_by_id(db: Session, user_id: uuid.UUID) -> DeleteUserResponse | N
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return DeleteUserResponse(
-        user_id=deleted_user_id
-    )
+    return DeleteUserResponse(user_id=deleted_user_id)
 
 
-def update_user_by_id(db: Session, user_id: uuid.UUID, params: UpdateUserRequest) -> UpdateUserResponse | None:
+def update_user_by_id(
+    db: Session, user_id: uuid.UUID, params: UpdateUserRequest
+) -> UpdateUserResponse | None:
     user_repo = UserRepository(db)
     try:
-        updated_user = user_repo.update_user_by_id(user_id=user_id, name=params.name, surname=params.surname, email=params.email)
+        updated_user = user_repo.update_user_by_id(
+            user_id=user_id,
+            name=params.name,
+            surname=params.surname,
+            email=params.email,
+        )
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

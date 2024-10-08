@@ -4,8 +4,6 @@ import subprocess
 import pytest
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
-from app.api.schemas.user import CreateUserRequest, ShowUser
-from app.repository.user import UserRepository
 from app.db.models.users import User
 from starlette.testclient import TestClient
 from app.db.session import get_db
@@ -13,7 +11,10 @@ import os
 from app.main import app
 
 
-test_engine = create_engine("postgresql://postgres_test:postgres_test@localhost:5433/granit_db_test", future=True)
+test_engine = create_engine(
+    "postgresql://postgres_test:postgres_test@localhost:5433/granit_db_test",
+    future=True,
+)
 
 test_session = sessionmaker(bind=test_engine, expire_on_commit=False)
 
@@ -35,7 +36,10 @@ def run_migration():
 
 @pytest.fixture(scope="function")
 def db():
-    engine = create_engine("postgresql://postgres_test:postgres_test@localhost:5433/granit_db_test", future=True)
+    engine = create_engine(
+        "postgresql://postgres_test:postgres_test@localhost:5433/granit_db_test",
+        future=True,
+    )
     _Session = sessionmaker(bind=engine, expire_on_commit=False, class_=Session)
     session = _Session()
     yield session
@@ -68,14 +72,14 @@ def client() -> Generator[TestClient, Any, None]:
 @pytest.fixture()
 def create_user_in_db():
     def wrapper(
-            user_id: str,
-            name: str,
-            surname: str,
-            email: str,
-            is_active: bool,
-            hashed_password: str,
-            roles: list,
-            session: Session,
+        user_id: str,
+        name: str,
+        surname: str,
+        email: str,
+        is_active: bool,
+        hashed_password: str,
+        roles: list,
+        session: Session,
     ):
         user = User(
             user_id=user_id,
