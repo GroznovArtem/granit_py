@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
+from typing import List
+from app.api.schemas.portal_role import UserPortalRoles
 
 
 class ShowUser(BaseModel):
@@ -15,7 +17,7 @@ class GetUserResponse(BaseModel):
     email: str
     hashed_password: str
     is_active: bool
-    roles: list
+    roles: List[UserPortalRoles]
 
 
 class CreateUserResponse(BaseModel):
@@ -46,3 +48,10 @@ class UpdateUserResponse(BaseModel):
     name: str
     surname: str
     email: str
+
+
+class AssignAdminRoleResponse(BaseModel):
+    name: str
+    surname: str
+    email: str
+    roles: List[UserPortalRoles]

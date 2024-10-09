@@ -2,6 +2,8 @@ import uuid
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from app.api.schemas.portal_role import UserPortalRoles
 from app.db.session import get_db
 from app.core.auth import get_current_user_from_token
 from app.db.models.users import User
@@ -12,13 +14,15 @@ from app.api.schemas.user import (
     GetUserResponse,
     DeleteUserResponse,
     UpdateUserResponse,
-    UpdateUserRequest,
+    UpdateUserRequest, AssignAdminRoleResponse,
 )
 from app.core.user import (
     create_new_user,
     get_user_by_id,
     delete_user_by_id,
     update_user_by_id,
+    assign_user_role,
+    revoke_user_role,
 )
 
 from fastapi.exceptions import HTTPException
@@ -56,7 +60,9 @@ def get_user(
 
 @user_router.delete("/{user_id}", response_model=DeleteUserResponse)
 def delete_user(
-    user_id: uuid.UUID, db: Session = Depends(get_db)
+    user_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> DeleteUserResponse:
     deleted_user_id = delete_user_by_id(db, user_id)
 
@@ -70,7 +76,10 @@ def delete_user(
 
 @user_router.patch("/{user_id}", response_model=UpdateUserResponse)
 def update_user(
-    user_id: uuid.UUID, body: UpdateUserRequest, db: Session = Depends(get_db)
+    user_id: uuid.UUID,
+    body: UpdateUserRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> UpdateUserResponse:
     if not body.name or not body.surname or not body.email:
         raise HTTPException(status_code=400, detail="All fields must be filled in.")
@@ -83,3 +92,32 @@ def update_user(
         )
 
     return updated_user
+
+
+@user_router.patch("assign_role/", response_model=AssignAdminRoleResponse)
+def assign_admin_role(to_user: uuid.UUID, role: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_from_token)) -> AssignAdminRoleResponse:
+    if UserPortalRoles.ROLE_SUPER_ADMIN not in current_user.roles:
+        raise HTTPException(status_code=409, detail="Forbidden.")
+
+    # if role == "ADMIN":
+    role_to_assign = UserPortalRoles.ROLE_ADMIN
+
+    if role == "SUPER_ADMIN":
+        role_to_assign = UserPortalRoles.ROLE_SUPER_ADMIN
+
+    assigned_user = assign_user_role(db=db, from_user=current_user, to_user_id=to_user, role=role_to_assign)
+
+    if not assigned_user:
+        raise HTTPException(status_code=404, detail=f"User with id {to_user} not found.")
+
+    return assigned_user
+
+
+@user_router.patch("revoke_role/", response_model=AssignAdminRoleResponse)
+def revoke_admin_role(to_user: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user_from_token)) -> AssignAdminRoleResponse:
+    revoked_user = revoke_user_role(db=db, from_user=current_user, to_user_id=to_user, role=UserPortalRoles.ROLE_ADMIN)
+
+    if not revoked_user:
+        raise HTTPException(status_code=404, detail=f"User with id {to_user} not found.")
+
+    return revoked_user

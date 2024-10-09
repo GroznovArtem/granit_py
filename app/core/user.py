@@ -1,14 +1,16 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
+from app.db.models.users import User
 
+from app.api.schemas.portal_role import UserPortalRoles
 from app.api.schemas.user import (
     CreateUserRequest,
     CreateUserResponse,
     GetUserResponse,
     DeleteUserResponse,
     UpdateUserRequest,
-    UpdateUserResponse,
+    UpdateUserResponse, AssignAdminRoleResponse,
 )
 from app.repository.user import UserRepository
 
@@ -84,4 +86,32 @@ def update_user_by_id(
             name=updated_user["name"],
             surname=updated_user["surname"],
             email=updated_user["email"],
+        )
+
+
+def assign_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles) -> AssignAdminRoleResponse | None:
+    user_repo = UserRepository(db)
+
+    assigned_user = user_repo.assign_user_role(to_user_id, role)
+
+    if assigned_user:
+        return AssignAdminRoleResponse(
+            name=assigned_user["name"],
+            surname=assigned_user["surname"],
+            email=assigned_user["email"],
+            roles=assigned_user["roles"],
+        )
+
+
+def revoke_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles) -> AssignAdminRoleResponse | None:
+    user_repo = UserRepository(db)
+
+    assigned_user = user_repo.revoke_user_role(to_user_id, role)
+
+    if assigned_user:
+        return AssignAdminRoleResponse(
+            name=assigned_user["name"],
+            surname=assigned_user["surname"],
+            email=assigned_user["email"],
+            roles=assigned_user["roles"],
         )

@@ -1,8 +1,12 @@
 import uuid
 
 from sqlalchemy.orm import Session
+
+from app.api.schemas.portal_role import UserPortalRoles
 from app.db.models.users import User
 from app.services.hashing import Hasher
+
+from typing import Any
 
 
 class UserRepository:
@@ -63,4 +67,40 @@ class UserRepository:
                 "name": user.name,
                 "surname": user.surname,
                 "email": user.email,
+            }
+
+    def assign_user_role(self, to_user_id: uuid.UUID, role: UserPortalRoles) -> dict[str, Any] | None:
+        user = self._db.query(User).filter(User.user_id == to_user_id).first()
+
+        if user:
+            current_roles = user.roles.copy()
+            current_roles.append(role)
+            user.roles = current_roles
+
+            self._db.commit()
+            self._db.flush()
+
+            return {
+                "name": user.name,
+                "surname": user.surname,
+                "email": user.email,
+                "roles": user.roles,
+            }
+
+    def revoke_user_role(self, to_user_id: uuid.UUID, role: UserPortalRoles) -> dict[str, Any] | None:
+        user = self._db.query(User).filter(User.user_id == to_user_id).first()
+
+        if user:
+            current_roles = user.roles.copy()
+            current_roles.remove(role)
+            user.roles = current_roles
+
+            self._db.commit()
+            self._db.flush()
+
+            return {
+                "name": user.name,
+                "surname": user.surname,
+                "email": user.email,
+                "roles": user.roles,
             }
