@@ -124,3 +124,40 @@ def test_update_user_if_not_found(db, client, create_user_in_db, user_params):
     assert response.json() == {
         "detail": f"User with id {user_params['user_id']} not found."
     }
+
+
+# def test_get_users(db, client, create_user_in_db, user_params):
+#     u_p_1 = user_params
+#     u_p_1["email"] = "test1@ya.ru"
+#     u_p_2 = user_params
+#     u_p_2["email"] = "test2@ya.ru"
+#     u_p_3 = user_params
+#     u_p_3["email"] = "test3@ya.ru"
+#     create_user_in_db(**u_p_1, session=db)
+#     create_user_in_db(**u_p_2, session=db)
+#     create_user_in_db(**u_p_3, session=db)
+#
+#     response = client.get(
+#         "/user"
+#     )
+#
+#     assert response.status_code == 200
+#     assert response.json() == {
+#         users: [
+#             {
+#                 "name": u_p_1["name"],
+#                 "surname": u_p_1["surname"],
+#                 "email": u_p_1["email"],
+#             },
+#             {
+#                 "name": u_p_2["name"],
+#                 "surname": u_p_2["surname"],
+#                 "email": u_p_2["email"],
+#             },
+#             {
+#                 "name": u_p_3["name"],
+#                 "surname": u_p_3["surname"],
+#                 "email": u_p_3["email"],
+#             },
+#         ]
+#     }

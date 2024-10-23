@@ -10,7 +10,7 @@ from app.api.schemas.user import (
     GetUserResponse,
     DeleteUserResponse,
     UpdateUserRequest,
-    UpdateUserResponse, AssignAdminRoleResponse,
+    UpdateUserResponse, AssignAdminRoleResponse, ShowUser, ShowUsersResponse, GetUser
 )
 from app.repository.user import UserRepository
 
@@ -58,10 +58,14 @@ def get_user_by_id(db: Session, user_id: uuid.UUID) -> GetUserResponse | None:
 
 def delete_user_by_id(db: Session, user_id: uuid.UUID) -> DeleteUserResponse | None:
     user_repo = UserRepository(db)
+    deleted_user_id = None
     try:
         deleted_user_id = user_repo.delete_user_by_id(user_id)
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+    if not deleted_user_id:
+        raise HTTPException(status_code=402, detail="User not found")
 
     return DeleteUserResponse(user_id=deleted_user_id)
 
@@ -114,4 +118,15 @@ def revoke_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: 
             surname=assigned_user["surname"],
             email=assigned_user["email"],
             roles=assigned_user["roles"],
+        )
+
+
+def get_all_users(db: Session):
+    user_repo = UserRepository(db)
+
+    users = user_repo.get_users()
+
+    if users:
+        return ShowUsersResponse(
+            users=[GetUser(user_id=user.user_id, name=user.name, surname=user.surname, email=user.email, is_active=user.is_active) for user in users]
         )

@@ -3,11 +3,21 @@ from uuid import UUID
 from typing import List
 from app.api.schemas.portal_role import UserPortalRoles
 
+from typing import List
+
 
 class ShowUser(BaseModel):
     name: str
     surname: str
     email: str
+
+
+class GetUser(BaseModel):
+    user_id: UUID
+    name: str
+    surname: str
+    email: str
+    is_active: bool
 
 
 class GetUserResponse(BaseModel):
@@ -55,3 +65,7 @@ class AssignAdminRoleResponse(BaseModel):
     surname: str
     email: str
     roles: List[UserPortalRoles]
+
+
+class ShowUsersResponse(BaseModel):
+    users: List[GetUser]

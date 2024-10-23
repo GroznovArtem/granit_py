@@ -14,7 +14,7 @@ from app.api.schemas.user import (
     GetUserResponse,
     DeleteUserResponse,
     UpdateUserResponse,
-    UpdateUserRequest, AssignAdminRoleResponse,
+    UpdateUserRequest, AssignAdminRoleResponse, ShowUsersResponse
 )
 from app.core.user import (
     create_new_user,
@@ -23,6 +23,7 @@ from app.core.user import (
     update_user_by_id,
     assign_user_role,
     revoke_user_role,
+    get_all_users,
 )
 
 from fastapi.exceptions import HTTPException
@@ -62,7 +63,6 @@ def get_user(
 def delete_user(
     user_id: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_from_token),
 ) -> DeleteUserResponse:
     deleted_user_id = delete_user_by_id(db, user_id)
 
@@ -121,3 +121,15 @@ def revoke_admin_role(to_user: uuid.UUID, db: Session = Depends(get_db), current
         raise HTTPException(status_code=404, detail=f"User with id {to_user} not found.")
 
     return revoked_user
+
+
+@user_router.get("/")
+def get_users(db: Session = Depends(get_db)) -> ShowUsersResponse:
+    users = get_all_users(db)
+
+    if not users:
+        raise HTTPException(
+            status_code=404, detail=f"Users not found."
+        )
+
+    return users

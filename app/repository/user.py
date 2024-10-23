@@ -6,7 +6,7 @@ from app.api.schemas.portal_role import UserPortalRoles
 from app.db.models.users import User
 from app.services.hashing import Hasher
 
-from typing import Any
+from typing import Any, List, Type
 
 
 class UserRepository:
@@ -31,6 +31,11 @@ class UserRepository:
 
     def get_user_by_id(self, user_id: uuid.UUID) -> User | None:
         user = self._db.query(User).filter(User.user_id == user_id).first()
+
+        return user
+
+    def get_users(self) -> List[Type[User]] | None:
+        user = self._db.query(User).all()
 
         return user
 
