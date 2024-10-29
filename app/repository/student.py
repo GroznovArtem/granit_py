@@ -22,7 +22,6 @@ class StudentRepository:
 
             return student
 
-
     def get_students(self) -> List[Type[Student]] | None:
         students = self._db.query(Student).all()
 

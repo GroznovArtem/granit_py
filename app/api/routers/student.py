@@ -1,17 +1,13 @@
-import uuid
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.schemas.portal_role import UserPortalRoles
 from app.db.session import get_db
-from app.core.auth import get_current_user_from_token
-from app.db.models.users import User, Student
 
 from app.api.schemas.student import (
     GetStudentsResponse,
     CreateStudentResponse,
-    CreateStudentRequest
+    CreateStudentRequest,
 )
 from app.core.student import (
     create_student_by_id,
@@ -25,13 +21,13 @@ student_router = APIRouter()
 
 
 @student_router.post("/")
-def create_student(data: CreateStudentRequest, db: Session = Depends(get_db)) -> CreateStudentResponse:
+def create_student(
+    data: CreateStudentRequest, db: Session = Depends(get_db)
+) -> CreateStudentResponse:
     student = create_student_by_id(db, user_id=data.user_id)
 
     if not student:
-        raise HTTPException(
-            status_code=404, detail="User not found."
-        )
+        raise HTTPException(status_code=404, detail="User not found.")
 
     return student
 
@@ -41,8 +37,6 @@ def get_students(db: Session = Depends(get_db)) -> GetStudentsResponse:
     students = get_all_students(db)
 
     if not students:
-        raise HTTPException(
-            status_code=404, detail="Students not found."
-        )
+        raise HTTPException(status_code=404, detail="Students not found.")
 
     return students
