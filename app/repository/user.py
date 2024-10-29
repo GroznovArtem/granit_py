@@ -74,7 +74,9 @@ class UserRepository:
                 "email": user.email,
             }
 
-    def assign_user_role(self, to_user_id: uuid.UUID, role: UserPortalRoles) -> dict[str, Any] | None:
+    def assign_user_role(
+        self, to_user_id: uuid.UUID, role: UserPortalRoles
+    ) -> dict[str, Any] | None:
         user = self._db.query(User).filter(User.user_id == to_user_id).first()
 
         if user:
@@ -92,7 +94,9 @@ class UserRepository:
                 "roles": user.roles,
             }
 
-    def revoke_user_role(self, to_user_id: uuid.UUID, role: UserPortalRoles) -> dict[str, Any] | None:
+    def revoke_user_role(
+        self, to_user_id: uuid.UUID, role: UserPortalRoles
+    ) -> dict[str, Any] | None:
         user = self._db.query(User).filter(User.user_id == to_user_id).first()
 
         if user:

@@ -1,12 +1,10 @@
-import uuid
 
 from sqlalchemy.orm import Session
 
-from app.api.schemas.portal_role import UserPortalRoles
 from app.db.models.users import User, Teacher
-from app.services.hashing import Hasher
 
-from typing import Any, List, Type
+from typing import List, Type
+
 
 class TeacherRepository:
     def __init__(self, db: Session):

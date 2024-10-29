@@ -1,40 +1,26 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from fastapi.exceptions import HTTPException
-from app.db.models.users import User
 
-from app.api.schemas.portal_role import UserPortalRoles
-from app.api.schemas.user import (
-    CreateUserRequest,
-    CreateUserResponse,
-    GetUserResponse,
-    DeleteUserResponse,
-    UpdateUserRequest,
-    UpdateUserResponse,
-    AssignAdminRoleResponse,
-    ShowUser,
-    ShowUsersResponse,
-    GetUser,
-)
 from app.api.schemas.teacher import (
-    CreateTeacherRequest,
     CreateTeacherResponse,
     GetTeachersResponse,
     ShowTeacher,
 )
-from app.repository.user import UserRepository
 from app.repository.teacher import TeacherRepository
 
 import uuid
 
 
-def create_teacher_by_user_id(db: Session, user_id: uuid.UUID) -> CreateTeacherResponse | None:
+def create_teacher_by_user_id(
+    db: Session, user_id: uuid.UUID
+) -> CreateTeacherResponse | None:
     teacher_repo = TeacherRepository(db)
 
     teacher = teacher_repo.create_teacher_by_id(user_id=user_id)
 
     if teacher:
-        return CreateTeacherResponse(user_id=teacher.user_id, teacher_id=teacher.teacher_id)
+        return CreateTeacherResponse(
+            user_id=teacher.user_id, teacher_id=teacher.teacher_id
+        )
 
 
 def get_all_teachers(db: Session) -> GetTeachersResponse | None:
@@ -44,5 +30,13 @@ def get_all_teachers(db: Session) -> GetTeachersResponse | None:
 
     if teachers:
         return GetTeachersResponse(
-            teachers=[ShowTeacher(user_id=teacher.user_id, teacher_id=teacher.user_id, students_ids=teacher.students_ids, groups_ids=teacher.groups_ids) for teacher in teachers]
+            teachers=[
+                ShowTeacher(
+                    user_id=teacher.user_id,
+                    teacher_id=teacher.user_id,
+                    students_ids=teacher.students_ids,
+                    groups_ids=teacher.groups_ids,
+                )
+                for teacher in teachers
+            ]
         )

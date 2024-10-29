@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from uuid import UUID
 from typing import List
-from app.api.schemas.portal_role import UserPortalRoles
 
 
 class CreateTeacherRequest(BaseModel):

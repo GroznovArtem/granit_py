@@ -12,18 +12,10 @@ from app.api.schemas.user import (
     UpdateUserRequest,
     UpdateUserResponse,
     AssignAdminRoleResponse,
-    ShowUser,
     ShowUsersResponse,
     GetUser,
 )
-from app.api.schemas.teacher import (
-    CreateTeacherRequest,
-    CreateTeacherResponse,
-    GetTeachersResponse,
-    ShowTeacher,
-)
 from app.repository.user import UserRepository
-from app.repository.teacher import TeacherRepository
 
 import uuid
 
@@ -104,7 +96,9 @@ def update_user_by_id(
         )
 
 
-def assign_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles) -> AssignAdminRoleResponse | None:
+def assign_user_role(
+    db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles
+) -> AssignAdminRoleResponse | None:
     user_repo = UserRepository(db)
 
     assigned_user = user_repo.assign_user_role(to_user_id, role)
@@ -118,7 +112,9 @@ def assign_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: 
         )
 
 
-def revoke_user_role(db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles) -> AssignAdminRoleResponse | None:
+def revoke_user_role(
+    db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles
+) -> AssignAdminRoleResponse | None:
     user_repo = UserRepository(db)
 
     assigned_user = user_repo.revoke_user_role(to_user_id, role)
@@ -139,8 +135,18 @@ def get_all_users(db: Session):
 
     if users:
         return ShowUsersResponse(
-            users=[GetUser(user_id=user.user_id, name=user.name, surname=user.surname, email=user.email, is_active=user.is_active) for user in users]
+            users=[
+                GetUser(
+                    user_id=user.user_id,
+                    name=user.name,
+                    surname=user.surname,
+                    email=user.email,
+                    is_active=user.is_active,
+                )
+                for user in users
+            ]
         )
+
 
 #
 # def create_teacher_by_user_id(db: Session, user_id: uuid.UUID) -> CreateTeacherResponse | None:
