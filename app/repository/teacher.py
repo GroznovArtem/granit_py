@@ -1,3 +1,4 @@
+import uuid
 
 from sqlalchemy.orm import Session
 
@@ -10,7 +11,7 @@ class TeacherRepository:
     def __init__(self, db: Session):
         self._db = db
 
-    def create_teacher_by_id(self, user_id) -> Teacher | None:
+    def create_teacher_by_id(self, user_id: uuid.UUID) -> Teacher | None:
         user = self._db.query(User).filter(User.user_id == user_id).first()
 
         if user:
