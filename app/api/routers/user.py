@@ -14,7 +14,9 @@ from app.api.schemas.user import (
     GetUserResponse,
     DeleteUserResponse,
     UpdateUserResponse,
-    UpdateUserRequest, AssignAdminRoleResponse, ShowUsersResponse
+    UpdateUserRequest,
+    AssignAdminRoleResponse,
+    ShowUsersResponse,
 )
 from app.core.user import (
     create_new_user,
@@ -29,6 +31,18 @@ from app.core.user import (
 from fastapi.exceptions import HTTPException
 
 user_router = APIRouter()
+
+
+# @user_router.get("/get_teachers")
+# def get_teachers(db: Session = Depends(get_db)) -> GetTeachersResponse:
+#     teachers = get_all_teachers(db)
+#
+#     if not teachers:
+#         raise HTTPException(
+#             status_code=404, detail="Teachers not found."
+#         )
+#
+#     return teachers
 
 
 @user_router.post("/", response_model=CreateUserResponse)
@@ -133,3 +147,15 @@ def get_users(db: Session = Depends(get_db)) -> ShowUsersResponse:
         )
 
     return users
+
+
+# @user_router.post("/create_teacher")
+# def create_teacher(data: CreateTeacherRequest, db: Session = Depends(get_db)) -> CreateTeacherResponse:
+#     teacher = create_teacher_by_user_id(db, user_id=data.user_id)
+#
+#     if not teacher:
+#         raise HTTPException(
+#             status_code=400, detail="Unbound error."
+#         )
+#
+#     return teacher
