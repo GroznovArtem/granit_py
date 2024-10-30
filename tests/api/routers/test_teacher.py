@@ -2,7 +2,6 @@ import uuid
 
 import pytest
 
-from app.db.models.users import User
 from sqlalchemy.orm import Session
 from app.db.models.users import Teacher
 
@@ -30,6 +29,7 @@ def create_teacher():
             db.flush()
 
         return teacher.teacher_id
+
     return wrapper
 
 
@@ -41,7 +41,9 @@ def test_create_teacher(db, create_user_in_db, user_params, client):
     assert response.status_code == 200
     assert response.json()["user_id"] == user_params["user_id"]
 
-    teacher = db.query(Teacher).filter(Teacher.user_id == user_params["user_id"]).first()
+    teacher = (
+        db.query(Teacher).filter(Teacher.user_id == user_params["user_id"]).first()
+    )
 
     assert teacher is not None
 
@@ -50,9 +52,7 @@ def test_create_teacher_if_user_not_found(db, create_user_in_db, user_params, cl
     response = client.post("/teacher", json={"user_id": user_params["user_id"]})
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Unbound error."
-    }
+    assert response.json() == {"detail": "Unbound error."}
 
     teacher = db.query(Teacher).first()
 
@@ -101,9 +101,24 @@ def test_get_teachers(db, create_user_in_db, create_teacher, user_params, client
     assert response.status_code == 200
     assert response.json() == {
         "teachers": [
-            {"user_id": str(user1["user_id"]), "teacher_id": str(teacher_id1), "students_ids": [], "groups_ids": []},
-            {"user_id": str(user2["user_id"]), "teacher_id": str(teacher_id2), "students_ids": [], "groups_ids": []},
-            {"user_id": str(user3["user_id"]), "teacher_id": str(teacher_id3), "students_ids": [], "groups_ids": []},
+            {
+                "user_id": str(user1["user_id"]),
+                "teacher_id": str(teacher_id1),
+                "students_ids": [],
+                "groups_ids": [],
+            },
+            {
+                "user_id": str(user2["user_id"]),
+                "teacher_id": str(teacher_id2),
+                "students_ids": [],
+                "groups_ids": [],
+            },
+            {
+                "user_id": str(user3["user_id"]),
+                "teacher_id": str(teacher_id3),
+                "students_ids": [],
+                "groups_ids": [],
+            },
         ]
     }
 

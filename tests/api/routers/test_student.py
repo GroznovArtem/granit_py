@@ -2,7 +2,6 @@ import uuid
 
 import pytest
 
-from app.db.models.users import User
 from sqlalchemy.orm import Session
 from app.db.models.users import Student
 
@@ -30,6 +29,7 @@ def create_student():
             db.flush()
 
         return student.student_id
+
     return wrapper
 
 
@@ -41,7 +41,9 @@ def test_create_student(db, create_user_in_db, user_params, client):
     assert response.status_code == 200
     assert response.json()["user_id"] == user_params["user_id"]
 
-    student = db.query(Student).filter(Student.user_id == user_params["user_id"]).first()
+    student = (
+        db.query(Student).filter(Student.user_id == user_params["user_id"]).first()
+    )
 
     assert student is not None
 
@@ -50,9 +52,7 @@ def test_create_student_if_user_not_found(db, create_user_in_db, user_params, cl
     response = client.post("/student", json={"user_id": user_params["user_id"]})
 
     assert response.status_code == 400
-    assert response.json() == {
-        "detail": "Unbound error."
-    }
+    assert response.json() == {"detail": "Unbound error."}
 
     student = db.query(Student).first()
 
@@ -101,9 +101,21 @@ def test_get_student(db, create_user_in_db, create_student, user_params, client)
     assert response.status_code == 200
     assert response.json() == {
         "students": [
-            {"user_id": str(user1["user_id"]), "student_id": str(student_id1), "teachers_ids": []},
-            {"user_id": str(user2["user_id"]), "student_id": str(student_id2), "teachers_ids": []},
-            {"user_id": str(user3["user_id"]), "student_id": str(student_id3), "teachers_ids": []},
+            {
+                "user_id": str(user1["user_id"]),
+                "student_id": str(student_id1),
+                "teachers_ids": [],
+            },
+            {
+                "user_id": str(user2["user_id"]),
+                "student_id": str(student_id2),
+                "teachers_ids": [],
+            },
+            {
+                "user_id": str(user3["user_id"]),
+                "student_id": str(student_id3),
+                "teachers_ids": [],
+            },
         ]
     }
 

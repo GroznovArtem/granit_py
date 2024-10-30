@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 
 from app.api.schemas.portal_role import UserPortalRoles
 from app.db.session import get_db
-from app.core.auth import get_current_user_from_token
 from app.db.models.users import User
 
 from app.api.schemas.user import (
@@ -27,6 +26,7 @@ from app.core.user import (
     revoke_user_role,
     get_all_users,
 )
+from app.core.auth import get_current_user_from_token
 
 from fastapi.exceptions import HTTPException
 
@@ -101,7 +101,7 @@ def assign_admin_role(
     to_user: uuid.UUID,
     role: str,
     db: Session = Depends(get_db),
-    # current_user: User = Depends(get_current_user_from_token),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> AssignAdminRoleResponse:
     if UserPortalRoles.ROLE_SUPER_ADMIN not in current_user.roles:
         raise HTTPException(status_code=409, detail="Forbidden.")
@@ -128,7 +128,7 @@ def assign_admin_role(
 def revoke_admin_role(
     to_user: uuid.UUID,
     db: Session = Depends(get_db),
-    # current_user: User = Depends(get_current_user_from_token),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> AssignAdminRoleResponse:
     revoked_user = revoke_user_role(
         db=db,
