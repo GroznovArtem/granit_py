@@ -33,18 +33,6 @@ from fastapi.exceptions import HTTPException
 user_router = APIRouter()
 
 
-# @user_router.get("/get_teachers")
-# def get_teachers(db: Session = Depends(get_db)) -> GetTeachersResponse:
-#     teachers = get_all_teachers(db)
-#
-#     if not teachers:
-#         raise HTTPException(
-#             status_code=404, detail="Teachers not found."
-#         )
-#
-#     return teachers
-
-
 @user_router.post("/", response_model=CreateUserResponse)
 def create_user(
     body: CreateUserRequest, db: Session = Depends(get_db)
@@ -61,7 +49,7 @@ def create_user(
 def get_user(
     user_id: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_from_token),
+    # current_user: User = Depends(get_current_user_from_token),
 ) -> GetUserResponse:
     user = get_user_by_id(db, user_id)
 
@@ -80,7 +68,7 @@ def delete_user(
 ) -> DeleteUserResponse:
     deleted_user_id = delete_user_by_id(db, user_id)
 
-    if not deleted_user_id.user_id:
+    if not deleted_user_id:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
@@ -93,7 +81,7 @@ def update_user(
     user_id: uuid.UUID,
     body: UpdateUserRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_from_token),
+    # current_user: User = Depends(get_current_user_from_token),
 ) -> UpdateUserResponse:
     if not body.name or not body.surname or not body.email:
         raise HTTPException(status_code=400, detail="All fields must be filled in.")
@@ -113,7 +101,7 @@ def assign_admin_role(
     to_user: uuid.UUID,
     role: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_from_token),
+    # current_user: User = Depends(get_current_user_from_token),
 ) -> AssignAdminRoleResponse:
     if UserPortalRoles.ROLE_SUPER_ADMIN not in current_user.roles:
         raise HTTPException(status_code=409, detail="Forbidden.")
@@ -140,7 +128,7 @@ def assign_admin_role(
 def revoke_admin_role(
     to_user: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_from_token),
+    # current_user: User = Depends(get_current_user_from_token),
 ) -> AssignAdminRoleResponse:
     revoked_user = revoke_user_role(
         db=db,
@@ -165,15 +153,3 @@ def get_users(db: Session = Depends(get_db)) -> ShowUsersResponse:
         raise HTTPException(status_code=404, detail="Users not found.")
 
     return users
-
-
-# @user_router.post("/create_teacher")
-# def create_teacher(data: CreateTeacherRequest, db: Session = Depends(get_db)) -> CreateTeacherResponse:
-#     teacher = create_teacher_by_user_id(db, user_id=data.user_id)
-#
-#     if not teacher:
-#         raise HTTPException(
-#             status_code=400, detail="Unbound error."
-#         )
-#
-#     return teacher

@@ -33,7 +33,7 @@ def get_all_teachers(db: Session) -> GetTeachersResponse | None:
             teachers=[
                 ShowTeacher(
                     user_id=teacher.user_id,
-                    teacher_id=teacher.user_id,
+                    teacher_id=teacher.teacher_id,
                     students_ids=teacher.students_ids,
                     groups_ids=teacher.groups_ids,
                 )

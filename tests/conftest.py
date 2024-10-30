@@ -20,6 +20,8 @@ test_session = sessionmaker(bind=test_engine, expire_on_commit=False)
 
 CLEAN_TABLES = [
     "users",
+    "teachers",
+    "students",
 ]
 
 

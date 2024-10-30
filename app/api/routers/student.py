@@ -27,7 +27,7 @@ def create_student(
     student = create_student_by_id(db, user_id=data.user_id)
 
     if not student:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise HTTPException(status_code=400, detail="Unbound error.")
 
     return student
 

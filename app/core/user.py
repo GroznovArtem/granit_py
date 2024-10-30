@@ -67,10 +67,8 @@ def delete_user_by_id(db: Session, user_id: uuid.UUID) -> DeleteUserResponse | N
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    if not deleted_user_id:
-        raise HTTPException(status_code=402, detail="User not found")
-
-    return DeleteUserResponse(user_id=deleted_user_id)
+    if deleted_user_id is not None:
+        return DeleteUserResponse(user_id=deleted_user_id)
 
 
 def update_user_by_id(
@@ -146,24 +144,3 @@ def get_all_users(db: Session):
                 for user in users
             ]
         )
-
-
-#
-# def create_teacher_by_user_id(db: Session, user_id: uuid.UUID) -> CreateTeacherResponse | None:
-#     teacher_repo = TeacherRepository(db)
-#
-#     teacher = teacher_repo.create_teacher_by_id(user_id=user_id)
-#
-#     if teacher:
-#         return CreateTeacherResponse(user_id=teacher.user_id, teacher_id=teacher.teacher_id)
-#
-#
-# def get_all_teachers(db: Session) -> GetTeachersResponse | None:
-#     teacher_repo = TeacherRepository(db)
-#
-#     teachers = teacher_repo.get_teachers()
-#
-#     if teachers:
-#         return GetTeachersResponse(
-#             teachers=[ShowTeacher(user_id=teacher.user_id, teacher_id=teacher.user_id, students_ids=teacher.students_ids, groups_ids=teacher.groups_ids) for teacher in teachers]
-#         )
