@@ -43,7 +43,9 @@ def get_all_teachers(db: Session) -> GetTeachersResponse | None:
         )
 
 
-def delete_teacher_by_id(db: Session, teacher_id: uuid.UUID) -> DeleteTeacherResponse | None:
+def delete_teacher_by_id(
+    db: Session, teacher_id: uuid.UUID
+) -> DeleteTeacherResponse | None:
     teacher_repo = TeacherRepository(db)
 
     deleted_teacher = teacher_repo.delete_teacher_by_id(teacher_id=teacher_id)

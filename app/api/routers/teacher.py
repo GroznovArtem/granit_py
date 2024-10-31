@@ -45,7 +45,9 @@ def create_teacher(
 
 
 @teacher_router.delete("/{teacher_id}")
-def delete_teacher(teacher_id: uuid.UUID, db: Session = Depends(get_db)) -> DeleteTeacherResponse:
+def delete_teacher(
+    teacher_id: uuid.UUID, db: Session = Depends(get_db)
+) -> DeleteTeacherResponse:
     deleted_teacher_id = delete_teacher_by_id(db, teacher_id=teacher_id)
 
     if not deleted_teacher_id:

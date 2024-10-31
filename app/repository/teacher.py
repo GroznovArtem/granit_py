@@ -29,7 +29,9 @@ class TeacherRepository:
             return teachers
 
     def delete_teacher_by_id(self, teacher_id: uuid.UUID) -> Type[Teacher] | None:
-        teacher = self._db.query(Teacher).filter(Teacher.teacher_id == teacher_id).first()
+        teacher = (
+            self._db.query(Teacher).filter(Teacher.teacher_id == teacher_id).first()
+        )
 
         if teacher:
             self._db.delete(teacher)

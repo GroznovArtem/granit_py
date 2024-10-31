@@ -42,7 +42,9 @@ def get_all_students(db: Session) -> GetStudentsResponse | None:
         )
 
 
-def delete_student_by_id(db: Session, student_id: uuid.UUID) -> DeleteStudentResponse | None:
+def delete_student_by_id(
+    db: Session, student_id: uuid.UUID
+) -> DeleteStudentResponse | None:
     student_repo = StudentRepository(db)
 
     deleted_student = student_repo.delete_student_by_id(student_id=student_id)

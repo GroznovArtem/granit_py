@@ -133,9 +133,7 @@ def test_delete_teacher(db, create_user_in_db, create_teacher, user_params, clie
     response = client.delete("/teacher/{}".format(str(teacher_id)))
 
     assert response.status_code == 200
-    assert response.json() == {
-        "teacher_id": str(teacher_id)
-    }
+    assert response.json() == {"teacher_id": str(teacher_id)}
 
     teacher = db.query(Teacher).filter(Teacher.teacher_id == teacher_id).first()
 

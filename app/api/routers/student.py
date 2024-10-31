@@ -46,7 +46,9 @@ def get_students(db: Session = Depends(get_db)) -> GetStudentsResponse:
 
 
 @student_router.delete("/{student_id}")
-def delete_student(student_id: uuid.UUID, db: Session = Depends(get_db)) -> DeleteStudentResponse:
+def delete_student(
+    student_id: uuid.UUID, db: Session = Depends(get_db)
+) -> DeleteStudentResponse:
     deleted_student_id = delete_student_by_id(db, student_id=student_id)
 
     if not deleted_student_id:
