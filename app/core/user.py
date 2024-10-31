@@ -1,9 +1,20 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi.exceptions import HTTPException
+from app.db.models.users import User
 
-from app.api.schemas.user import ShowUser, CreateUserRequest, CreateUserResponse, GetUserResponse, DeleteUserResponse, \
-    UpdateUserRequest, UpdateUserResponse
+from app.api.schemas.portal_role import UserPortalRoles
+from app.api.schemas.user import (
+    CreateUserRequest,
+    CreateUserResponse,
+    GetUserResponse,
+    DeleteUserResponse,
+    UpdateUserRequest,
+    UpdateUserResponse,
+    AssignAdminRoleResponse,
+    ShowUsersResponse,
+    GetUser,
+)
 from app.repository.user import UserRepository
 
 import uuid
@@ -13,7 +24,12 @@ def create_new_user(db: Session, params: CreateUserRequest) -> CreateUserRespons
     user_repo = UserRepository(db)
 
     try:
-        user = user_repo.create_user(name=params.name, surname=params.surname, email=params.email, hashed_password=params.hashed_password)
+        user = user_repo.create_user(
+            name=params.name,
+            surname=params.surname,
+            email=params.email,
+            hashed_password=params.hashed_password,
+        )
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -45,20 +61,27 @@ def get_user_by_id(db: Session, user_id: uuid.UUID) -> GetUserResponse | None:
 
 def delete_user_by_id(db: Session, user_id: uuid.UUID) -> DeleteUserResponse | None:
     user_repo = UserRepository(db)
+    deleted_user_id = None
     try:
         deleted_user_id = user_repo.delete_user_by_id(user_id)
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return DeleteUserResponse(
-        user_id=deleted_user_id
-    )
+    if deleted_user_id is not None:
+        return DeleteUserResponse(user_id=deleted_user_id)
 
 
-def update_user_by_id(db: Session, user_id: uuid.UUID, params: UpdateUserRequest) -> UpdateUserResponse | None:
+def update_user_by_id(
+    db: Session, user_id: uuid.UUID, params: UpdateUserRequest
+) -> UpdateUserResponse | None:
     user_repo = UserRepository(db)
     try:
-        updated_user = user_repo.update_user_by_id(user_id=user_id, name=params.name, surname=params.surname, email=params.email)
+        updated_user = user_repo.update_user_by_id(
+            user_id=user_id,
+            name=params.name,
+            surname=params.surname,
+            email=params.email,
+        )
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -68,4 +91,56 @@ def update_user_by_id(db: Session, user_id: uuid.UUID, params: UpdateUserRequest
             name=updated_user["name"],
             surname=updated_user["surname"],
             email=updated_user["email"],
+        )
+
+
+def assign_user_role(
+    db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles
+) -> AssignAdminRoleResponse | None:
+    user_repo = UserRepository(db)
+
+    assigned_user = user_repo.assign_user_role(to_user_id, role)
+
+    if assigned_user:
+        return AssignAdminRoleResponse(
+            name=assigned_user["name"],
+            surname=assigned_user["surname"],
+            email=assigned_user["email"],
+            roles=assigned_user["roles"],
+        )
+
+
+def revoke_user_role(
+    db: Session, from_user: User, to_user_id: uuid.UUID, role: UserPortalRoles
+) -> AssignAdminRoleResponse | None:
+    user_repo = UserRepository(db)
+
+    assigned_user = user_repo.revoke_user_role(to_user_id, role)
+
+    if assigned_user:
+        return AssignAdminRoleResponse(
+            name=assigned_user["name"],
+            surname=assigned_user["surname"],
+            email=assigned_user["email"],
+            roles=assigned_user["roles"],
+        )
+
+
+def get_all_users(db: Session):
+    user_repo = UserRepository(db)
+
+    users = user_repo.get_users()
+
+    if users:
+        return ShowUsersResponse(
+            users=[
+                GetUser(
+                    user_id=user.user_id,
+                    name=user.name,
+                    surname=user.surname,
+                    email=user.email,
+                    is_active=user.is_active,
+                )
+                for user in users
+            ]
         )
