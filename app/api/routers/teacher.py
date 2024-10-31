@@ -7,13 +7,17 @@ from app.api.schemas.teacher import (
     CreateTeacherRequest,
     CreateTeacherResponse,
     GetTeachersResponse,
+    DeleteTeacherResponse,
 )
 from app.core.teacher import (
     create_teacher_by_user_id,
     get_all_teachers,
+    delete_teacher_by_id,
 )
 
 from fastapi.exceptions import HTTPException
+
+import uuid
 
 teacher_router = APIRouter()
 
@@ -38,3 +42,13 @@ def create_teacher(
         raise HTTPException(status_code=400, detail="Unbound error.")
 
     return teacher
+
+
+@teacher_router.delete("/{teacher_id}")
+def delete_teacher(teacher_id: uuid.UUID, db: Session = Depends(get_db)) -> DeleteTeacherResponse:
+    deleted_teacher_id = delete_teacher_by_id(db, teacher_id=teacher_id)
+
+    if not deleted_teacher_id:
+        raise HTTPException(status_code=404, detail="Teacher not found.")
+
+    return deleted_teacher_id

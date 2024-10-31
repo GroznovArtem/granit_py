@@ -20,3 +20,7 @@ class CreateStudentRequest(BaseModel):
 class CreateStudentResponse(BaseModel):
     user_id: UUID
     student_id: UUID
+
+
+class DeleteStudentResponse(BaseModel):
+    student_id: UUID

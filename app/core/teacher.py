@@ -4,6 +4,7 @@ from app.api.schemas.teacher import (
     CreateTeacherResponse,
     GetTeachersResponse,
     ShowTeacher,
+    DeleteTeacherResponse,
 )
 from app.repository.teacher import TeacherRepository
 
@@ -39,4 +40,15 @@ def get_all_teachers(db: Session) -> GetTeachersResponse | None:
                 )
                 for teacher in teachers
             ]
+        )
+
+
+def delete_teacher_by_id(db: Session, teacher_id: uuid.UUID) -> DeleteTeacherResponse | None:
+    teacher_repo = TeacherRepository(db)
+
+    deleted_teacher = teacher_repo.delete_teacher_by_id(teacher_id=teacher_id)
+
+    if deleted_teacher:
+        return DeleteTeacherResponse(
+            teacher_id=deleted_teacher.teacher_id,
         )

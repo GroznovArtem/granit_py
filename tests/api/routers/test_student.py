@@ -121,3 +121,19 @@ def test_get_student(db, create_user_in_db, create_student, user_params, client)
 
     student = db.query(Student).all()
     assert len(student) == 3
+
+
+def test_delete_student(db, create_user_in_db, create_student, user_params, client):
+    create_user_in_db(**user_params, session=db)
+    student_id = create_student(uuid.UUID(user_params["user_id"]), session=db)
+
+    response = client.delete("/student/{}".format(str(student_id)))
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "student_id": str(student_id)
+    }
+
+    student = db.query(Student).filter(Student.student_id == student_id).first()
+
+    assert student is None

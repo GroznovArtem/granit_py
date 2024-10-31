@@ -27,3 +27,13 @@ class TeacherRepository:
 
         if teachers:
             return teachers
+
+    def delete_teacher_by_id(self, teacher_id: uuid.UUID) -> Type[Teacher] | None:
+        teacher = self._db.query(Teacher).filter(Teacher.teacher_id == teacher_id).first()
+
+        if teacher:
+            self._db.delete(teacher)
+            self._db.commit()
+            self._db.flush()
+
+            return teacher

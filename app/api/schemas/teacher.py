@@ -21,3 +21,7 @@ class ShowTeacher(BaseModel):
 
 class GetTeachersResponse(BaseModel):
     teachers: List[ShowTeacher]
+
+
+class DeleteTeacherResponse(BaseModel):
+    teacher_id: UUID

@@ -4,6 +4,7 @@ from app.api.schemas.student import (
     CreateStudentResponse,
     GetStudentsResponse,
     ShowStudent,
+    DeleteStudentResponse,
 )
 from app.repository.student import StudentRepository
 
@@ -38,4 +39,15 @@ def get_all_students(db: Session) -> GetStudentsResponse | None:
                 )
                 for student in students
             ]
+        )
+
+
+def delete_student_by_id(db: Session, student_id: uuid.UUID) -> DeleteStudentResponse | None:
+    student_repo = StudentRepository(db)
+
+    deleted_student = student_repo.delete_student_by_id(student_id=student_id)
+
+    if deleted_student:
+        return DeleteStudentResponse(
+            student_id=deleted_student.student_id,
         )
